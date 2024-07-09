@@ -43,10 +43,10 @@ class Map:
 
     def draw_map(self, sc: Surface) -> None:
         draw.rect(sc, (0, 0, 0), (
-            self.org_start[0] - 20,
-            self.org_start[1] - 20,
-            self.org_end[0] - self.org_start[0] + 40,
-            self.org_end[1] - self.org_start[1] + 60
+            self.start_pos[0],
+            self.start_pos[1],
+            self.end_pos[0] - self.start_pos[0],
+            self.end_pos[1] - self.start_pos[1]
         ))
         self.draw_rows(sc)
         self.draw_cols(sc)
