@@ -1,8 +1,15 @@
-from typing import Tuple
+from typing import Tuple, List
 from pygame import Surface, draw, mouse
 
 
 class Map:
+    START_SYMBOL = "X"
+    END_SYMBOL = "O"
+    WALL_SYMBOL = "x"
+    PATH_SYMBOL = "#"
+    VISITED_SYMBOL = "V"
+    SOLUTION_SYMBOL = "S"
+
     def __init__(self, tile_size: int, start_pos: Tuple[int, int], end_pos: Tuple[int, int]):
         self.tile_size = tile_size
         self.org_start = start_pos
@@ -16,7 +23,9 @@ class Map:
         self.end_pos = self.end_pos[0] - delta_width, self.end_pos[1]
         self.num_of_rows = (self.end_pos[1] - self.start_pos[1]) // self.tile_size
         self.num_of_cols = (self.end_pos[0] - self.start_pos[0]) // self.tile_size
-        self.map = [["x" for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
+        self.map = [[Map.WALL_SYMBOL for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
+        self.map[0][0] = Map.START_SYMBOL
+        self.map[0][5] = Map.END_SYMBOL
 
     def draw_rows(self, sc: Surface) -> None:
         y = 0
@@ -55,10 +64,18 @@ class Map:
             for col_index, col in enumerate(row):
                 x = col_index * self.tile_size + self.start_pos[0]
                 y = row_index * self.tile_size + self.start_pos[1]
-                if col == "#":  # Path
+                if col == Map.PATH_SYMBOL:  # Path
                     draw.rect(sc, (160, 100, 80), (x, y, self.tile_size, self.tile_size))
-                if col == "x":  # Wall
+                elif col == Map.WALL_SYMBOL:  # Wall
                     draw.rect(sc, (110, 110, 110), (x + 1, y + 1, self.tile_size - 2, self.tile_size - 2))
+                elif col == Map.END_SYMBOL:
+                    draw.rect(sc, (160, 0, 0), (x, y, self.tile_size, self.tile_size))
+                elif col == Map.START_SYMBOL:
+                    draw.rect(sc, (0, 160, 0), (x, y, self.tile_size, self.tile_size))
+                elif col == Map.VISITED_SYMBOL:
+                    draw.rect(sc, (61, 90, 254), (x, y, self.tile_size, self.tile_size))
+                elif col == Map.SOLUTION_SYMBOL:
+                    draw.rect(sc, (144, 202, 249), (x, y, self.tile_size, self.tile_size))
 
     def handle(self) -> None:
         mouse_buttons = mouse.get_pressed()
@@ -77,11 +94,11 @@ class Map:
             return
 
         if mouse_buttons[0]:
-            if self.map[row][column] == "x":
-                self.map[row][column] = "#"
+            if self.map[row][column] == Map.WALL_SYMBOL:
+                self.map[row][column] = Map.PATH_SYMBOL
 
         elif mouse_buttons[2]:
-            self.map[row][column] = "x"
+            self.map[row][column] = Map.WALL_SYMBOL
 
     def get_map_indexes(self, coord: Tuple[int, int]) -> Tuple[int, int]:
         row = coord[1] // self.tile_size
@@ -100,7 +117,7 @@ class Map:
         self.num_of_rows = (self.end_pos[1] - self.start_pos[1]) // self.tile_size
         self.num_of_cols = (self.end_pos[0] - self.start_pos[0]) // self.tile_size
 
-        new_map = [["x" for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
+        new_map = [[Map.WALL_SYMBOL for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
 
         for y, row in enumerate(new_map):
             for x, column in enumerate(row):
@@ -108,3 +125,13 @@ class Map:
                     new_map[y][x] = self.map[y][x]
 
         self.map = new_map
+
+    def visit_place_on_map(self, coord: Tuple[int, int]) -> None:
+        self.map[coord[0]][coord[1]] = Map.VISITED_SYMBOL
+
+    def show_solution(self, path: List[Tuple[int, int]]) -> None:
+        for coord in path:
+            self.map[coord[0]][coord[1]] = Map.SOLUTION_SYMBOL
+
+    def restart_map(self):
+        self.map = [[Map.WALL_SYMBOL for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]

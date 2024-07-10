@@ -1,9 +1,11 @@
 import pygame
+import time
 
 from MapClass import Map
 from SliderClass import Slider
 from GameState import StateManager, GameState
 from KeyHandlerClass import KeyHandler
+from algorithms.BreadthFirstSearch import BreadthFirstSearch
 
 # pygame setup
 pygame.init()
@@ -12,6 +14,7 @@ screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
 pygame.display.set_caption("Path Finding Visualization")
 clock = pygame.time.Clock()
 RUNNING = True
+ALGORITHM = None
 dt_ups = 0
 dt_fps = 0
 UPS = 200
@@ -35,14 +38,15 @@ def draw_screen(sc: pygame.Surface, state_m: StateManager, *args) -> None:
         for obj in args:
             obj.draw(sc)
     elif state_m.get_state() == GameState.VISUALIZATING:
-        pass
+        for obj in args:
+            obj.draw(sc)
     elif state_m.get_state() == GameState.MENU:
         pass
     pygame.display.flip()
 
 
 def update(state_m: StateManager, map_maze: Map, map_size: Slider) -> None:
-    global RUNNING
+    global RUNNING, ALGORITHM
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -53,12 +57,24 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider) -> None:
     if state_m.get_state() == GameState.EDITING:
         map_maze.resize_map(map_size.val)
         map_maze.handle()
-        if key_handler.is_key_pressed(pygame.K_RETURN):
+        if key_handler.is_key_pressed(pygame.K_ESCAPE):
             state_m.change_state(GameState.MENU)
-    elif state_m.get_state() == GameState.VISUALIZATING:
-        pass
-    elif state_m.get_state() == GameState.MENU:
         if key_handler.is_key_pressed(pygame.K_RETURN):
+            state_m.change_state(GameState.VISUALIZATING)
+
+    elif state_m.get_state() == GameState.VISUALIZATING:
+        if not ALGORITHM:
+            ALGORITHM = BreadthFirstSearch(map_maze.map, Map.START_SYMBOL, Map.END_SYMBOL, Map.WALL_SYMBOL)
+        for coord in ALGORITHM.find_path():
+            map_maze.visit_place_on_map(coord)
+        map_maze.show_solution(ALGORITHM.solution)
+        time.sleep(3)
+        ALGORITHM = None
+        # map_maze.restart_map()
+        state_m.change_state(GameState.EDITING)
+
+    elif state_m.get_state() == GameState.MENU:
+        if key_handler.is_key_pressed(pygame.K_ESCAPE):
             state_m.change_state(GameState.EDITING)
 
 
