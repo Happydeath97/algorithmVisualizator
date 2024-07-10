@@ -7,13 +7,13 @@ class Map:
         self.tile_size = tile_size
         self.org_start = start_pos
         self.org_end = end_pos
-        self.end_pos = (self.org_start[0] + ((self.org_end[0] - self.org_start[0]) // self.tile_size + 1) * self.tile_size,
-                        self.org_start[1] + ((self.org_end[1] - self.org_start[1]) // self.tile_size + 1) * self.tile_size)
-        #########
+        self.end_pos = (
+            self.org_start[0] + ((self.org_end[0] - self.org_start[0]) // self.tile_size + 1) * self.tile_size,
+            self.org_start[1] + ((self.org_end[1] - self.org_start[1]) // self.tile_size + 1) * self.tile_size
+        )
         delta_width = (self.end_pos[0] - self.org_end[0]) // 2
         self.start_pos = self.org_start[0] - delta_width, self.org_start[1]
         self.end_pos = self.end_pos[0] - delta_width, self.end_pos[1]
-        #########
         self.num_of_rows = (self.end_pos[1] - self.start_pos[1]) // self.tile_size
         self.num_of_cols = (self.end_pos[0] - self.start_pos[0]) // self.tile_size
         self.map = [["x" for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
@@ -41,7 +41,7 @@ class Map:
 
             x += self.tile_size
 
-    def draw_map(self, sc: Surface) -> None:
+    def draw(self, sc: Surface) -> None:
         draw.rect(sc, (0, 0, 0), (
             self.start_pos[0],
             self.start_pos[1],
@@ -60,7 +60,7 @@ class Map:
                 if col == "x":  # Wall
                     draw.rect(sc, (110, 110, 110), (x + 1, y + 1, self.tile_size - 2, self.tile_size - 2))
 
-    def update_map(self) -> None:
+    def handle(self) -> None:
         mouse_buttons = mouse.get_pressed()
 
         if not any(mouse_buttons):
@@ -88,10 +88,12 @@ class Map:
         column = coord[0] // self.tile_size
         return row, column
 
-    def resize_map(self, new_tile_size) -> None:
+    def resize_map(self, new_tile_size: int) -> None:
         self.tile_size = new_tile_size
-        self.end_pos = (self.org_start[0] + ((self.org_end[0] - self.org_start[0]) // self.tile_size + 1) * self.tile_size,
-                        self.org_start[1] + ((self.org_end[1] - self.org_start[1]) // self.tile_size + 1) * self.tile_size)
+        self.end_pos = (
+            self.org_start[0] + ((self.org_end[0] - self.org_start[0]) // self.tile_size + 1) * self.tile_size,
+            self.org_start[1] + ((self.org_end[1] - self.org_start[1]) // self.tile_size + 1) * self.tile_size
+        )
         delta_width = (self.end_pos[0] - self.org_end[0]) // 2
         self.start_pos = self.org_start[0] - delta_width, self.org_start[1]
         self.end_pos = self.end_pos[0] - delta_width, self.end_pos[1]
