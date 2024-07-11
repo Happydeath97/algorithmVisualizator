@@ -35,6 +35,7 @@ class BreadthFirstSearch:
                 self.solution = path
                 with self.queue.mutex:
                     self.queue.queue.clear()
+                return
                 # for i in path:
                 #     r, c = i
                 #     pygame.draw.rect(
