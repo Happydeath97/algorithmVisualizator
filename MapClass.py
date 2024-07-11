@@ -24,9 +24,8 @@ class Map:
         self.end_pos = self.end_pos[0] - delta_width, self.end_pos[1]
         self.num_of_rows = (self.end_pos[1] - self.start_pos[1]) // self.tile_size
         self.num_of_cols = (self.end_pos[0] - self.start_pos[0]) // self.tile_size
-        self.map = [[Map.WALL_SYMBOL for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
-        self.map[0][0] = Map.START_SYMBOL
-        self.map[0][5] = Map.END_SYMBOL
+        self.map = [[Map.PATH_SYMBOL for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
+        self.current_symbol = Map.PATH_SYMBOL
 
     def draw_rows(self, sc: Surface) -> None:
         y = 0
@@ -95,11 +94,24 @@ class Map:
             return
 
         if mouse_buttons[0]:
-            if self.map[row][column] == Map.WALL_SYMBOL:
-                self.map[row][column] = Map.PATH_SYMBOL
+            if self.current_symbol == Map.PATH_SYMBOL:
+                self.map[row][column] = self.current_symbol
+            if self.current_symbol == Map.START_SYMBOL:
+                self.replace_symbol_in_map(Map.START_SYMBOL, Map.WALL_SYMBOL)
+                self.map[row][column] = self.current_symbol
+            if self.current_symbol == Map.END_SYMBOL:
+                self.replace_symbol_in_map(Map.END_SYMBOL, Map.WALL_SYMBOL)
+                self.map[row][column] = self.current_symbol
 
         elif mouse_buttons[2]:
             self.map[row][column] = Map.WALL_SYMBOL
+
+    def replace_symbol_in_map(self, to_find: str, to_replace: str) -> None:
+        self.map = [[to_replace if element == to_find else element for element in row] for row in self.map]
+
+    def change_current_symbol(self, new_symbol: str) -> None:
+        if new_symbol == Map.START_SYMBOL or new_symbol == Map.END_SYMBOL or new_symbol == Map.PATH_SYMBOL:
+            self.current_symbol = new_symbol
 
     def get_map_indexes(self, coord: Tuple[int, int]) -> Tuple[int, int]:
         row = coord[1] // self.tile_size
