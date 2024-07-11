@@ -32,14 +32,28 @@ KNOB_RADIUS = 5
 MIN_VAL, MAX_VAL = 10, 40
 
 
-def draw_screen(sc: pygame.Surface, state_m: StateManager, *args) -> None:
+def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map, map_size: Slider) -> None:
+    global ALGORITHM
     sc.fill((200, 200, 200))
     if state_m.get_state() == GameState.EDITING:
-        for obj in args:
-            obj.draw(sc)
+        map_maze.draw(sc)
+        map_size.draw(sc)
+
     elif state_m.get_state() == GameState.VISUALIZATING:
-        for obj in args:
-            obj.draw(sc)
+        map_maze.draw(sc)
+        map_size.draw(sc)
+
+        if not ALGORITHM:
+            ALGORITHM = BreadthFirstSearch(map_maze.map, Map.START_SYMBOL, Map.END_SYMBOL, Map.WALL_SYMBOL)
+        for coord in ALGORITHM.find_path():
+            map_maze.visit_place_on_map(coord, sc)
+            pygame.time.delay(10)
+
+        map_maze.show_solution(ALGORITHM.solution, sc)
+        pygame.time.delay(3000)
+        ALGORITHM = None
+        state_m.change_state(GameState.EDITING)
+
     elif state_m.get_state() == GameState.MENU:
         pass
     pygame.display.flip()
@@ -63,15 +77,7 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider) -> None:
             state_m.change_state(GameState.VISUALIZATING)
 
     elif state_m.get_state() == GameState.VISUALIZATING:
-        if not ALGORITHM:
-            ALGORITHM = BreadthFirstSearch(map_maze.map, Map.START_SYMBOL, Map.END_SYMBOL, Map.WALL_SYMBOL)
-        for coord in ALGORITHM.find_path():
-            map_maze.visit_place_on_map(coord)
-        map_maze.show_solution(ALGORITHM.solution)
-        time.sleep(3)
-        ALGORITHM = None
-        # map_maze.restart_map()
-        state_m.change_state(GameState.EDITING)
+        pass
 
     elif state_m.get_state() == GameState.MENU:
         if key_handler.is_key_pressed(pygame.K_ESCAPE):

@@ -1,5 +1,6 @@
 from typing import Tuple, List
 from pygame import Surface, draw, mouse
+import pygame
 
 
 class Map:
@@ -126,12 +127,20 @@ class Map:
 
         self.map = new_map
 
-    def visit_place_on_map(self, coord: Tuple[int, int]) -> None:
-        self.map[coord[0]][coord[1]] = Map.VISITED_SYMBOL
+    def visit_place_on_map(self, coord: Tuple[int, int], sc: Surface) -> None:
+        # self.map[coord[0]][coord[1]] = Map.VISITED_SYMBOL
+        x = coord[1] * self.tile_size + self.start_pos[0]
+        y = coord[0] * self.tile_size + self.start_pos[1]
+        draw.rect(sc, (61, 90, 254), (x, y, self.tile_size, self.tile_size))
+        pygame.display.flip()
 
-    def show_solution(self, path: List[Tuple[int, int]]) -> None:
+    def show_solution(self, path: List[Tuple[int, int]], sc: Surface) -> None:
         for coord in path:
-            self.map[coord[0]][coord[1]] = Map.SOLUTION_SYMBOL
+            # self.map[coord[0]][coord[1]] = Map.SOLUTION_SYMBOL
+            x = coord[1] * self.tile_size + self.start_pos[0]
+            y = coord[0] * self.tile_size + self.start_pos[1]
+            draw.rect(sc, (144, 202, 249), (x, y, self.tile_size, self.tile_size))
+            pygame.display.flip()
 
-    def restart_map(self):
-        self.map = [[Map.WALL_SYMBOL for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
+    # def restart_map(self):
+    #     self.map = [[Map.WALL_SYMBOL for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
