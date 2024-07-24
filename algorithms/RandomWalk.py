@@ -10,7 +10,7 @@ class RandomWalk:
         self.start_position = self.find_position(self.start_symbol)
         self.end_position = self.find_position(self.end_symbol)
         self.visited = set()
-        self.solution = []
+        self.solution = list()
 
     def find_path(self):
         current_pos = self.start_position

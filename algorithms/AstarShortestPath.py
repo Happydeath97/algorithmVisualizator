@@ -10,7 +10,7 @@ class Astar:
         self.start_position = self.find_position(self.start_symbol)
         self.end_position = self.find_position(self.end_symbol)
         self.visited = set()
-        self.solution = []
+        self.solution = list()
         self.cost = {}  # Dictionary to store the cost to reach each cell
         self.heuristic = {}  # Dictionary to store the heuristic cost
 
