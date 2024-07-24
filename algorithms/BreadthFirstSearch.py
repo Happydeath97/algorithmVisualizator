@@ -1,8 +1,4 @@
-import pygame
 import queue
-
-
-CLOCK = pygame.time.Clock()
 
 
 class BreadthFirstSearch:
@@ -23,34 +19,13 @@ class BreadthFirstSearch:
             current_pos, path = self.queue.get()
             row, col = current_pos
             i = path[-1]
-            # r, c = i
             yield i
-            # pygame.draw.rect(
-            #     draws.screen,
-            #     (61, 90, 254),
-            #     (c * draws.TILESIZE, r * draws.TILESIZE, draws.TILESIZE, draws.TILESIZE)
-            # )
-            # pygame.display.update()
+
             if (row, col) == self.end_position:
                 self.solution = path
                 with self.queue.mutex:
                     self.queue.queue.clear()
                 return
-                # for i in path:
-                #     r, c = i
-                #     pygame.draw.rect(
-                #         draws.screen,
-                #         (144, 202, 249),
-                #         (c * draws.TILESIZE, r * draws.TILESIZE, draws.TILESIZE, draws.TILESIZE)
-                #     )
-                #     pygame.display.update()
-
-                # while True:
-                #     pygame.init()
-                #     event = pygame.event.wait()
-                #     if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                #         if not pygame.key.get_pressed()[pygame.K_SPACE]:
-                #             return
 
             neighbors = self.find_neighbors(row, col)
             for neighbor in neighbors:

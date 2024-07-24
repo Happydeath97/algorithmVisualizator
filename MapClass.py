@@ -130,7 +130,7 @@ class Map:
         self.num_of_rows = (self.end_pos[1] - self.start_pos[1]) // self.tile_size
         self.num_of_cols = (self.end_pos[0] - self.start_pos[0]) // self.tile_size
 
-        new_map = [[Map.WALL_SYMBOL for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
+        new_map = [[Map.PATH_SYMBOL for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
 
         for y, row in enumerate(new_map):
             for x, column in enumerate(row):

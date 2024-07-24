@@ -1,0 +1,2 @@
+class DepthFirstSearch:
+    pass

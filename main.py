@@ -4,7 +4,12 @@ from MapClass import Map
 from SliderClass import Slider
 from GameState import StateManager, GameState
 from KeyHandlerClass import KeyHandler
+from algorithms.AlgorithmManager import AlgorithmManager
 from algorithms.BreadthFirstSearch import BreadthFirstSearch
+from algorithms.DijkstraAlgorithm import DijkstraAlgorithm
+from algorithms.DepthFirstSearch import DepthFirstSearch
+from algorithms.RandomWalk import RandomWalk
+from algorithms.AstarShortestPath import Astar
 
 # pygame setup
 pygame.init()
@@ -13,8 +18,7 @@ screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
 pygame.display.set_caption("Path Finding Visualization")
 clock = pygame.time.Clock()
 RUNNING = True
-ALGORITHM = None
-a_path_gen = None
+ALGORITHM = AlgorithmManager()
 dt_ups = 0
 dt_fps = 0
 UPS = 200
@@ -33,7 +37,7 @@ MIN_VAL, MAX_VAL = 10, 40
 
 
 def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Slider) -> None:
-    global ALGORITHM, a_path_gen
+    global ALGORITHM
     if state_m.get_state() == GameState.EDITING:
         sc.fill((200, 200, 200))
         map_maze.draw(sc)
@@ -42,22 +46,22 @@ def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map, map_si
 
     elif state_m.get_state() == GameState.VISUALIZATING:
         # TODO encapsulate this:
-        if not ALGORITHM:
-            sc.fill((200, 200, 200))
-            map_maze.draw(sc)
-            map_size.draw(sc)
-            alg_speed.draw(sc)
-            ALGORITHM = BreadthFirstSearch(map_maze.map, Map.START_SYMBOL, Map.END_SYMBOL, Map.WALL_SYMBOL)
-            a_path_gen = ALGORITHM.find_path()
+        if not ALGORITHM.selected_algorithm:
 
-        coord = next(a_path_gen, None)
-        if coord:
-            map_maze.visit_place_on_map(coord, sc)
-            pygame.time.delay(100 - alg_speed.val*10)
+            ALGORITHM.select_algorithm("bfs")
+            ALGORITHM.find_path(map_maze.map)
+
+        if ALGORITHM.selected_algorithm:
+            coord = next(ALGORITHM.path_generator, None)
+            if coord:
+                map_maze.visit_place_on_map(coord, sc)
+                pygame.time.delay(100 - alg_speed.val*10)
+            else:
+                map_maze.show_solution(ALGORITHM.give_solution(), sc)
+                pygame.time.delay(3000)
+                ALGORITHM = AlgorithmManager()
+                state_m.change_state(GameState.EDITING)
         else:
-            map_maze.show_solution(ALGORITHM.solution, sc)
-            pygame.time.delay(3000)
-            ALGORITHM = None
             state_m.change_state(GameState.EDITING)
 
     elif state_m.get_state() == GameState.MENU:
@@ -73,6 +77,7 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
         if event.type == pygame.QUIT:
             RUNNING = False
         if state_m.get_state() == GameState.EDITING:
+            # handle sliders
             map_size.handle(event)
             alg_speed.handle(event)
 

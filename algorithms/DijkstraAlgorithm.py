@@ -1,0 +1,2 @@
+class DijkstraAlgorithm:
+    pass
