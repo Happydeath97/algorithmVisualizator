@@ -48,7 +48,7 @@ def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map, map_si
         # TODO encapsulate this:
         if not ALGORITHM.selected_algorithm:
 
-            ALGORITHM.select_algorithm("bfs")
+            ALGORITHM.select_algorithm("random")
             ALGORITHM.find_path(map_maze.map)
 
         if ALGORITHM.selected_algorithm:
@@ -81,6 +81,12 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
             map_size.handle(event)
             alg_speed.handle(event)
 
+        elif state_m.get_state() == GameState.VISUALIZATING:
+            pass
+        elif state_m.get_state() == GameState.MENU:
+            pass
+
+    # game state specific actions that don't need to check events (do not need to be called for each event)
     if state_m.get_state() == GameState.EDITING:
         map_maze.resize_map(map_size.val)
         map_maze.handle()

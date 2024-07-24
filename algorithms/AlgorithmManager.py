@@ -21,7 +21,7 @@ class AlgorithmManager:
             'astar': Astar,
             'dfs': DepthFirstSearch,
             'dijkstra': DijkstraAlgorithm,
-            'randomwalk': RandomWalk
+            'random': RandomWalk
         }
         self.selected_algorithm = None
         self.path_generator = iter([])
