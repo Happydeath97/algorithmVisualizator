@@ -1,15 +1,11 @@
 import pygame
 
-from MapClass import Map
-from SliderClass import Slider
-from GameState import StateManager, GameState
-from KeyHandlerClass import KeyHandler
-from algorithms.AlgorithmManager import AlgorithmManager
-from algorithms.BreadthFirstSearch import BreadthFirstSearch
-from algorithms.DijkstraAlgorithm import DijkstraAlgorithm
-from algorithms.DepthFirstSearch import DepthFirstSearch
-from algorithms.RandomWalk import RandomWalk
-from algorithms.AstarShortestPath import Astar
+from map_class import Map
+from user_interface.slider_class import Slider
+from user_interface.button_class import Button
+from game_state import StateManager, GameState
+from key_handler_class import KeyHandler
+from algorithms.algorithm_manager import AlgorithmManager
 
 # pygame setup
 pygame.init()
@@ -36,19 +32,22 @@ KNOB_RADIUS = 5
 MIN_VAL, MAX_VAL = 10, 40
 
 
-def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Slider) -> None:
+def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map,
+                map_size: Slider, alg_speed: Slider, t_button: Button) -> None:
     global ALGORITHM
+
     if state_m.get_state() == GameState.EDITING:
         sc.fill((200, 200, 200))
         map_maze.draw(sc)
         map_size.draw(sc)
         alg_speed.draw(sc)
+        t_button.draw(sc)
 
     elif state_m.get_state() == GameState.VISUALIZATING:
         # TODO encapsulate this:
         if not ALGORITHM.selected_algorithm:
 
-            ALGORITHM.select_algorithm("random")
+            ALGORITHM.select_algorithm("dfs")
             ALGORITHM.find_path(map_maze.map)
 
         if ALGORITHM.selected_algorithm:
@@ -70,7 +69,7 @@ def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map, map_si
     pygame.display.flip()
 
 
-def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Slider) -> None:
+def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Slider, t_button: Button) -> None:
     global RUNNING, ALGORITHM
 
     for event in pygame.event.get():
@@ -80,6 +79,7 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
             # handle sliders
             map_size.handle(event)
             alg_speed.handle(event)
+            t_button.handle(event)
 
         elif state_m.get_state() == GameState.VISUALIZATING:
             pass
@@ -118,6 +118,7 @@ if __name__ == "__main__":
     map_size_slider = Slider((SLIDER_X, 100), (SLIDER_WIDTH, SLIDER_HEIGHT), KNOB_RADIUS, (MIN_VAL, MAX_VAL),
                              "Tile Size")
     alg_speed_slider = Slider((SLIDER_X, 200), (SLIDER_WIDTH, SLIDER_HEIGHT), KNOB_RADIUS, (1, 10), "Speed")
+    test_button = Button((20, 400), (100, 50), "TEST")
     while RUNNING:
         dt = clock.tick()
 
@@ -128,11 +129,11 @@ if __name__ == "__main__":
             dt_fps = 0
 
             # TODO in future make all interface parts (slider etc) in a list or something
-            draw_screen(screen, state_manager, m, map_size_slider, alg_speed_slider)
+            draw_screen(screen, state_manager, m, map_size_slider, alg_speed_slider, test_button)
 
         if dt_ups >= time_per_update:
             dt_ups = 0
-            update(state_manager, m, map_size_slider, alg_speed_slider)
+            update(state_manager, m, map_size_slider, alg_speed_slider, test_button)
 
     pygame.quit()
     quit()

@@ -1,10 +1,10 @@
 from typing import List
-from MapClass import Map
-from algorithms.BreadthFirstSearch import BreadthFirstSearch
-from algorithms.DijkstraAlgorithm import DijkstraAlgorithm
-from algorithms.DepthFirstSearch import DepthFirstSearch
-from algorithms.RandomWalk import RandomWalk
-from algorithms.AstarShortestPath import Astar
+from map_class import Map
+from algorithms.breadth_first_search import BreadthFirstSearch
+from algorithms.dijkstra_algorithm import DijkstraAlgorithm
+from algorithms.depth_first_search import DepthFirstSearch
+from algorithms.random_walk import RandomWalk
+from algorithms.astar_shortest_path import Astar
 
 
 class AlgorithmManager:
