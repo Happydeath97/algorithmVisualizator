@@ -19,15 +19,13 @@ class Button:
                                ))
 
     def draw(self, sc: Surface) -> None:
-        if not self.pressed:
-            color = (100, 150, 150)
-        else:
-            color = (150, 100, 150)
+        color = (150, 150, 100) if self.active else (150, 100, 150)
+        color = (100, 150, 150) if self.pressed else color
 
         draw.rect(sc, color, (self.pos[0], self.pos[1], self.size[0], self.size[1]))
         self.draw_text(sc, f"{self.name}")
 
-    def handle(self, event) -> None:
+    def handle(self, event, button_group) -> None:
         if event.type == MOUSEBUTTONDOWN:
             if self.pos[0] <= event.pos[0] <= self.pos[0] + self.size[0] and \
                     self.pos[1] <= event.pos[1] <= self.pos[1] + self.size[1]:
@@ -38,5 +36,26 @@ class Button:
             if self.pressed:
                 if self.pos[0] <= event.pos[0] <= self.pos[0] + self.size[0] and self.pos[1] <= event.pos[1] <= \
                         self.pos[1] + self.size[1]:
-                    print(f"Button {self.name} pressed!")
+                    button_group.set_active(self)
                 self.pressed = False
+
+
+class ButtonGroup:
+    def __init__(self, *buttons: Button):
+        self.buttons = list(buttons)
+        self.buttons[0].active = True
+
+    def add_button(self, button: Button) -> None:
+        self.buttons.append(button)
+
+    def set_active(self, active_button: Button) -> None:
+        for button in self.buttons:
+            button.active = (button == active_button)
+
+    def handle(self, event) -> None:
+        for button in self.buttons:
+            button.handle(event, self)
+
+    def draw(self, sc: Surface) -> None:
+        for button in self.buttons:
+            button.draw(sc)

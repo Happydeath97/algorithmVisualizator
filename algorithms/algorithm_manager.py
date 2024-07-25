@@ -8,12 +8,6 @@ from algorithms.astar_shortest_path import Astar
 
 
 class AlgorithmManager:
-    START_SYMBOL = Map.START_SYMBOL
-    END_SYMBOL = Map.END_SYMBOL
-    WALL_SYMBOL = Map.WALL_SYMBOL
-    PATH_SYMBOL = Map.PATH_SYMBOL
-    VISITED_SYMBOL = Map.VISITED_SYMBOL
-    SOLUTION_SYMBOL = Map.SOLUTION_SYMBOL
 
     def __init__(self):
         self.algorithms = {

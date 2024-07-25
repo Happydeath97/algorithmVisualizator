@@ -2,7 +2,7 @@ import pygame
 
 from map_class import Map
 from user_interface.slider_class import Slider
-from user_interface.button_class import Button
+from user_interface.button_class import Button, ButtonGroup
 from game_state import StateManager, GameState
 from key_handler_class import KeyHandler
 from algorithms.algorithm_manager import AlgorithmManager
@@ -33,7 +33,7 @@ MIN_VAL, MAX_VAL = 10, 40
 
 
 def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map,
-                map_size: Slider, alg_speed: Slider, t_button: Button) -> None:
+                map_size: Slider, alg_speed: Slider, alg_group_b: ButtonGroup) -> None:
     global ALGORITHM
 
     if state_m.get_state() == GameState.EDITING:
@@ -41,13 +41,13 @@ def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map,
         map_maze.draw(sc)
         map_size.draw(sc)
         alg_speed.draw(sc)
-        t_button.draw(sc)
+        alg_group_b.draw(sc)
 
     elif state_m.get_state() == GameState.VISUALIZATING:
         # TODO encapsulate this:
         if not ALGORITHM.selected_algorithm:
-
-            ALGORITHM.select_algorithm("dfs")
+            selected_algorithm = get_current_algorithm(alg_group_b)
+            ALGORITHM.select_algorithm(selected_algorithm)
             ALGORITHM.find_path(map_maze.map)
 
         if ALGORITHM.selected_algorithm:
@@ -69,7 +69,7 @@ def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map,
     pygame.display.flip()
 
 
-def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Slider, t_button: Button) -> None:
+def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Slider, alg_group_b: ButtonGroup) -> None:
     global RUNNING, ALGORITHM
 
     for event in pygame.event.get():
@@ -79,7 +79,7 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
             # handle sliders
             map_size.handle(event)
             alg_speed.handle(event)
-            t_button.handle(event)
+            alg_group_b.handle(event)
 
         elif state_m.get_state() == GameState.VISUALIZATING:
             pass
@@ -111,6 +111,24 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
             state_m.change_state(GameState.EDITING)
 
 
+def get_current_algorithm(alg_group_b: ButtonGroup) -> str:
+    for button in alg_group_b.buttons:
+        if not button.active:
+            continue
+        if button.name == "A*":
+            return "astar"
+        elif button.name == "BFS":
+            return "bfs"
+        elif button.name == "DFS":
+            return "dfs"
+        elif button.name == "Dijkstra":
+            return "dijkstra"
+        elif button.name == "Random Walk":
+            return "random"
+        else:
+            return "bfs"
+
+
 if __name__ == "__main__":
     state_manager = StateManager()
     key_handler = KeyHandler(debounce_time=0.2)
@@ -118,22 +136,30 @@ if __name__ == "__main__":
     map_size_slider = Slider((SLIDER_X, 100), (SLIDER_WIDTH, SLIDER_HEIGHT), KNOB_RADIUS, (MIN_VAL, MAX_VAL),
                              "Tile Size")
     alg_speed_slider = Slider((SLIDER_X, 200), (SLIDER_WIDTH, SLIDER_HEIGHT), KNOB_RADIUS, (1, 10), "Speed")
-    test_button = Button((20, 400), (100, 50), "TEST")
+
+    astar_b = Button((SCREEN_W - 145, 100), (95, 50), "A*")
+    bfs_b = Button((SCREEN_W - 250, 100), (95, 50), "BFS")
+
+    dijkstra_b = Button((SCREEN_W - 145, 160), (95, 50), "Dijkstra")
+    dfs_b = Button((SCREEN_W - 250, 160), (95, 50), "DFS")
+
+    random_b = Button((SCREEN_W - 250, 220), (200, 50), "Random Walk")
+    alg_button_group = ButtonGroup(astar_b, bfs_b, dfs_b, dijkstra_b, random_b)
     while RUNNING:
         dt = clock.tick()
 
         dt_ups += dt
         dt_fps += dt
 
+        if dt_ups >= time_per_update:
+            dt_ups = 0
+            update(state_manager, m, map_size_slider, alg_speed_slider, alg_button_group)
+
         if dt_fps >= time_per_frame:
             dt_fps = 0
 
             # TODO in future make all interface parts (slider etc) in a list or something
-            draw_screen(screen, state_manager, m, map_size_slider, alg_speed_slider, test_button)
-
-        if dt_ups >= time_per_update:
-            dt_ups = 0
-            update(state_manager, m, map_size_slider, alg_speed_slider, test_button)
+            draw_screen(screen, state_manager, m, map_size_slider, alg_speed_slider, alg_button_group)
 
     pygame.quit()
     quit()
