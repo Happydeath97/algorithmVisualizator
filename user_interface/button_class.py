@@ -52,6 +52,15 @@ class ButtonGroup:
         for button in self.buttons:
             button.active = (button == active_button)
 
+    def at_least_one_member_active(self) -> bool:
+        if any(button.active for button in self.buttons):
+            return True
+        return False
+
+    def set_all_inactive(self) -> None:
+        for button in self.buttons:
+            button.active = False
+
     def handle(self, event) -> None:
         for button in self.buttons:
             button.handle(event, self)

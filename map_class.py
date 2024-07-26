@@ -1,6 +1,7 @@
 from typing import Tuple, List
 from pygame import Surface, draw, mouse
 import pygame
+import random
 
 
 class Map:
@@ -118,6 +119,19 @@ class Map:
         column = coord[0] // self.tile_size
         return row, column
 
+    def ready(self):
+        found_start = False
+        found_end = False
+        for row in self.map:
+            if found_end and found_start:
+                break
+            if Map.END_SYMBOL in row:
+                found_end = True
+            if Map.START_SYMBOL in row:
+                found_start = True
+
+        return found_end and found_start
+
     def resize_map(self, new_tile_size: int) -> None:
         self.tile_size = new_tile_size
         self.end_pos = (
@@ -156,3 +170,41 @@ class Map:
 
     # def restart_map(self):
     #     self.map = [[Map.WALL_SYMBOL for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
+
+    def generate_maze(self) -> None:
+        # Directions (up, down, left, right)
+        directions = [(-2, 0), (2, 0), (0, -2), (0, 2)]
+
+        def is_valid_move(x, y):
+            if x < 0 or x >= self.num_of_rows or y < 0 or y >= self.num_of_cols:
+                return False
+            if self.map[x][y] != Map.WALL_SYMBOL:
+                return False
+            return True
+
+        def carve_path(x, y):
+            self.map[x][y] = Map.PATH_SYMBOL
+            random.shuffle(directions)
+            for dx, dy in directions:
+                nx, ny = x + dx, y + dy
+                if is_valid_move(nx, ny):
+                    mid_x, mid_y = x + dx // 2, y + dy // 2
+                    self.map[mid_x][mid_y] = Map.PATH_SYMBOL
+                    carve_path(nx, ny)
+
+        self.map = [[Map.WALL_SYMBOL for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
+
+        # Starting point
+        start_x, start_y = 0, 0
+        carve_path(start_x, start_y)
+
+        # Set the start and end symbols
+        while not self.ready():
+            start_y = random.randint(0, self.num_of_rows - 1)
+            start_x = random.randint(0, self.num_of_cols - 1)
+            end_y = random.randint(0, self.num_of_rows - 1)
+            end_x = random.randint(0, self.num_of_cols - 1)
+
+            if self.map[start_y][start_x] == Map.PATH_SYMBOL and self.map[end_y][end_x] == Map.PATH_SYMBOL:
+                self.map[start_y][start_x] = Map.START_SYMBOL
+                self.map[end_y][end_x] = Map.END_SYMBOL

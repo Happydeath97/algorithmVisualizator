@@ -33,7 +33,7 @@ MIN_VAL, MAX_VAL = 10, 40
 
 
 def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map,
-                map_size: Slider, alg_speed: Slider, alg_group_b: ButtonGroup) -> None:
+                map_size: Slider, alg_speed: Slider, alg_group_b: ButtonGroup, gen_b_group) -> None:
     global ALGORITHM
 
     if state_m.get_state() == GameState.EDITING:
@@ -42,6 +42,7 @@ def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map,
         map_size.draw(sc)
         alg_speed.draw(sc)
         alg_group_b.draw(sc)
+        gen_b_group.draw(sc)
 
     elif state_m.get_state() == GameState.VISUALIZATING:
         # TODO encapsulate this:
@@ -69,7 +70,7 @@ def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map,
     pygame.display.flip()
 
 
-def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Slider, alg_group_b: ButtonGroup) -> None:
+def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Slider, alg_group_b: ButtonGroup, gen_b_group) -> None:
     global RUNNING, ALGORITHM
 
     for event in pygame.event.get():
@@ -80,6 +81,7 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
             map_size.handle(event)
             alg_speed.handle(event)
             alg_group_b.handle(event)
+            gen_b_group.handle(event)
 
         elif state_m.get_state() == GameState.VISUALIZATING:
             pass
@@ -92,8 +94,9 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
         map_maze.handle()
         if key_handler.is_key_pressed(pygame.K_ESCAPE):
             state_m.change_state(GameState.MENU)
-        if key_handler.is_key_pressed(pygame.K_RETURN):
+        if key_handler.is_key_pressed(pygame.K_RETURN) and map_maze.ready():
             state_m.change_state(GameState.VISUALIZATING)
+
         # TODO: Instead of changing this with a key button change it with a button in the app
         #  (implement buttons in interface)
         if key_handler.is_key_pressed(pygame.K_a):
@@ -102,6 +105,10 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
             map_maze.change_current_symbol(Map.START_SYMBOL)
         if key_handler.is_key_pressed(pygame.K_d):
             map_maze.change_current_symbol(Map.END_SYMBOL)
+        # if key_handler.is_key_pressed(pygame.K_r):
+        if gen_b_group.at_least_one_member_active():
+            map_maze.generate_maze()
+            gen_b_group.set_all_inactive()
 
     elif state_m.get_state() == GameState.VISUALIZATING:
         pass
@@ -139,12 +146,14 @@ if __name__ == "__main__":
 
     astar_b = Button((SCREEN_W - 145, 100), (95, 50), "A*")
     bfs_b = Button((SCREEN_W - 250, 100), (95, 50), "BFS")
-
     dijkstra_b = Button((SCREEN_W - 145, 160), (95, 50), "Dijkstra")
     dfs_b = Button((SCREEN_W - 250, 160), (95, 50), "DFS")
-
     random_b = Button((SCREEN_W - 250, 220), (200, 50), "Random Walk")
     alg_button_group = ButtonGroup(astar_b, bfs_b, dfs_b, dijkstra_b, random_b)
+
+    generate_b = Button((SCREEN_W - 250, 290), (200, 50), "Generate Maze")
+    gen_b_group = ButtonGroup(generate_b)
+
     while RUNNING:
         dt = clock.tick()
 
@@ -153,13 +162,13 @@ if __name__ == "__main__":
 
         if dt_ups >= time_per_update:
             dt_ups = 0
-            update(state_manager, m, map_size_slider, alg_speed_slider, alg_button_group)
+            update(state_manager, m, map_size_slider, alg_speed_slider, alg_button_group, gen_b_group)
 
         if dt_fps >= time_per_frame:
             dt_fps = 0
 
             # TODO in future make all interface parts (slider etc) in a list or something
-            draw_screen(screen, state_manager, m, map_size_slider, alg_speed_slider, alg_button_group)
+            draw_screen(screen, state_manager, m, map_size_slider, alg_speed_slider, alg_button_group, gen_b_group)
 
     pygame.quit()
     quit()
