@@ -153,6 +153,9 @@ class Map:
 
         self.map = new_map
 
+    def reset_grid(self) -> None:
+        self.map = [[Map.PATH_SYMBOL for _ in range(self.num_of_cols)] for _ in range(self.num_of_rows)]
+
     def visit_place_on_map(self, coord: Tuple[int, int], sc: Surface) -> None:
         # self.map[coord[0]][coord[1]] = Map.VISITED_SYMBOL
         x = coord[1] * self.tile_size + self.start_pos[0]
