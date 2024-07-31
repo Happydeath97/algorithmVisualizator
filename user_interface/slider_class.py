@@ -4,11 +4,11 @@ from pygame.font import Font
 
 
 class Slider:
-    def __init__(self, start_pos: Tuple[int, int], slider_size: Tuple[int, int], knob_r: int,
+    def __init__(self, start_pos: Tuple[int, int], slider_size: Tuple[int, int],
                  slider_range: Tuple[int, int], name: str):
         self.pos = start_pos
         self.slider_size = slider_size
-        self.knob_r = knob_r
+        self.knob_r = slider_size[1] // 2
         self.range = slider_range
         self.val = self.range[0]
         self.dragging = False

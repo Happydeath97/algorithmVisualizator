@@ -26,15 +26,13 @@ TILE_SIZE = 10
 START_POS_MAP = (300, 50)
 END_POS_MAP = (950, 500)
 ######################################################################################
-SLIDER_X, SLIDER_Y = 20, 100
-SLIDER_WIDTH, SLIDER_HEIGHT = 80, 10
-KNOB_RADIUS = SLIDER_HEIGHT // 2
+SLIDER_WIDTH, SLIDER_HEIGHT = 200, 20
 MIN_VAL, MAX_VAL = 10, 40
 
 
 def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Slider,
                 alg_group_b: ButtonGroup, gen_b_group: ButtonGroup, reset_grid_b_group: ButtonGroup,
-                start_alg_b_group: ButtonGroup) -> None:
+                start_alg_b_group: ButtonGroup, draw_button_group: ButtonGroup) -> None:
     global ALGORITHM
 
     if state_m.get_state() == GameState.EDITING:
@@ -46,6 +44,7 @@ def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map, map_si
         gen_b_group.draw(sc)
         reset_grid_b_group.draw(sc)
         start_alg_b_group.draw(sc)
+        draw_button_group.draw(sc)
 
     elif state_m.get_state() == GameState.VISUALIZATING:
         alg_group_b.draw(sc)
@@ -78,7 +77,8 @@ def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map, map_si
 
 
 def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Slider, alg_group_b: ButtonGroup,
-           gen_b_group: ButtonGroup, reset_grid_b_group: ButtonGroup, start_alg_b_group: ButtonGroup) -> None:
+           gen_b_group: ButtonGroup, reset_grid_b_group: ButtonGroup, start_alg_b_group: ButtonGroup,
+           draw_button_group: ButtonGroup) -> None:
     global RUNNING, ALGORITHM
 
     for event in pygame.event.get():
@@ -92,6 +92,7 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
             gen_b_group.handle(event)
             reset_grid_b_group.handle(event)
             start_alg_b_group.handle(event)
+            draw_button_group.handle(event)
 
         elif state_m.get_state() == GameState.VISUALIZATING:
             pass
@@ -106,24 +107,21 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
         if key_handler.is_key_pressed(pygame.K_ESCAPE):
             state_m.change_state(GameState.MENU)
 
-        # TODO: Instead of changing this with a key button change it with a button in the app
-        #  (implement buttons in interface)
-        if key_handler.is_key_pressed(pygame.K_a):
-            map_maze.change_current_symbol(Map.PATH_SYMBOL)
-        if key_handler.is_key_pressed(pygame.K_s):
-            map_maze.change_current_symbol(Map.START_SYMBOL)
-        if key_handler.is_key_pressed(pygame.K_d):
-            map_maze.change_current_symbol(Map.END_SYMBOL)
+        curr_path_symbol = get_current_path_symbol(draw_button_group)
+        map_maze.change_current_symbol(curr_path_symbol)
 
         if gen_b_group.at_least_one_member_active():
             map_maze.generate_maze()
             gen_b_group.set_all_inactive()
+
         if reset_grid_b_group.at_least_one_member_active():
             map_maze.reset_grid()
             reset_grid_b_group.set_all_inactive()
-        if ((start_alg_b_group.at_least_one_member_active() or key_handler.is_key_pressed(pygame.K_RETURN)) and
-                map_maze.ready()):
+
+        if map_maze.ready() and (start_alg_b_group.at_least_one_member_active() or key_handler.is_key_pressed(pygame.K_RETURN)):
             state_m.change_state(GameState.VISUALIZATING)
+            start_alg_b_group.set_all_inactive()
+        else:
             start_alg_b_group.set_all_inactive()
 
     elif state_m.get_state() == GameState.VISUALIZATING:
@@ -132,6 +130,20 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
     elif state_m.get_state() == GameState.MENU:
         if key_handler.is_key_pressed(pygame.K_ESCAPE):
             state_m.change_state(GameState.EDITING)
+
+
+def get_current_path_symbol(button_group: ButtonGroup) -> str:
+    for button in button_group.buttons:
+        if not button.active:
+            continue
+        elif button.name.lower() == "path":
+            return Map.PATH_SYMBOL
+        elif button.name.lower() == "start":
+            return Map.START_SYMBOL
+        elif button.name.lower() == "end":
+            return Map.END_SYMBOL
+        else:
+            return Map.PATH_SYMBOL
 
 
 def get_current_algorithm(alg_group_b: ButtonGroup) -> str:
@@ -156,9 +168,8 @@ if __name__ == "__main__":
     state_manager = StateManager()
     key_handler = KeyHandler(debounce_time=0.2)
     m = Map(TILE_SIZE, START_POS_MAP, END_POS_MAP)
-    map_size_slider = Slider((SLIDER_X, 100), (SLIDER_WIDTH, SLIDER_HEIGHT), KNOB_RADIUS, (MIN_VAL, MAX_VAL),
-                             "Tile Size")
-    alg_speed_slider = Slider((SLIDER_X, 200), (SLIDER_WIDTH, SLIDER_HEIGHT), KNOB_RADIUS, (1, 10), "Speed")
+    map_size_slider = Slider((40, 130), (SLIDER_WIDTH, SLIDER_HEIGHT), (10, 40), "Tile Size")
+    alg_speed_slider = Slider((40, 200), (SLIDER_WIDTH, SLIDER_HEIGHT), (1, 10), "Speed")
 
     astar_b = Button((SCREEN_W - 145, 100), (95, 50), "A*")
     bfs_b = Button((SCREEN_W - 250, 100), (95, 50), "BFS")
@@ -166,6 +177,11 @@ if __name__ == "__main__":
     dfs_b = Button((SCREEN_W - 250, 160), (95, 50), "DFS")
     random_b = Button((SCREEN_W - 250, 220), (200, 50), "Random Walk")
     alg_button_group = ButtonGroup(astar_b, bfs_b, dfs_b, dijkstra_b, random_b)
+
+    path_b = Button((40, 290), (200, 50), "Path")
+    start_b = Button((40, 350), (200, 50), "Start")
+    end_b = Button((40, 410), (200, 50), "End")
+    draw_button_group = ButtonGroup(path_b, start_b, end_b)
 
     generate_b = Button((SCREEN_W - 250, 290), (200, 50), "Generate Maze")
     gen_b_group = ButtonGroup(generate_b)
@@ -188,14 +204,14 @@ if __name__ == "__main__":
         if dt_ups >= time_per_update:
             dt_ups = 0
             update(state_manager, m, map_size_slider, alg_speed_slider, alg_button_group, gen_b_group,
-                   reset_grid_b_group, start_alg_b_group)
+                   reset_grid_b_group, start_alg_b_group, draw_button_group)
 
         if dt_fps >= time_per_frame:
             dt_fps = 0
 
             # TODO in future make all interface parts (slider etc) in a list or something
             draw_screen(screen, state_manager, m, map_size_slider, alg_speed_slider, alg_button_group, gen_b_group,
-                        reset_grid_b_group, start_alg_b_group)
+                        reset_grid_b_group, start_alg_b_group, draw_button_group)
 
     pygame.quit()
     quit()
