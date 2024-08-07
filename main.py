@@ -32,7 +32,7 @@ MIN_VAL, MAX_VAL = 10, 40
 
 
 def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Slider,
-                button_groups: dict) -> None:
+                buttons: dict) -> None:
     global ALGORITHM
 
     if state_m.get_state() == GameState.EDITING:
@@ -40,20 +40,20 @@ def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map, map_si
         map_maze.draw(sc)
         map_size.draw(sc)
         alg_speed.draw(sc)
-        button_groups['alg_group_b'].draw(sc)
-        button_groups['gen_b_group'].draw(sc)
-        button_groups['reset_grid_b_group'].draw(sc)
-        button_groups['start_alg_b_group'].draw(sc)
-        button_groups['draw_button_group'].draw(sc)
+        buttons['alg_group_b'].draw(sc)
+        buttons['gen_b_group'].draw(sc)
+        buttons['reset_grid_b_group'].draw(sc)
+        buttons['start_alg_b_group'].draw(sc)
+        buttons['draw_button_group'].draw(sc)
 
     elif state_m.get_state() == GameState.VISUALIZATING:
-        button_groups['alg_group_b'].draw(sc)
-        button_groups['gen_b_group'].draw(sc)
-        button_groups['reset_grid_b_group'].draw(sc)
-        button_groups['start_alg_b_group'].draw(sc)
+        buttons['alg_group_b'].draw(sc)
+        buttons['gen_b_group'].draw(sc)
+        buttons['reset_grid_b_group'].draw(sc)
+        buttons['start_alg_b_group'].draw(sc)
         # TODO encapsulate this:
         if not ALGORITHM.selected_algorithm:
-            selected_algorithm = get_current_algorithm(button_groups['alg_group_b'])
+            selected_algorithm = get_current_algorithm(buttons['alg_group_b'])
             ALGORITHM.select_algorithm(selected_algorithm)
             ALGORITHM.find_path(map_maze.map)
 
@@ -72,18 +72,18 @@ def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map, map_si
 
     elif state_m.get_state() == GameState.MENU:
         sc.fill((200, 200, 200))
-        button_groups['start_b_group'].draw(sc)
-        button_groups['credit_b_group'].draw(sc)
-        button_groups['end_b_group'].draw(sc)
+        buttons['start_b_group'].draw(sc)
+        buttons['credit_b_group'].draw(sc)
+        buttons['end_b_group'].draw(sc)
 
     elif state_m.get_state() == GameState.CREDIT:
         sc.fill((200, 200, 200))
-        button_groups['back_b_group'].draw(sc)
+        buttons['back_b_group'].draw(sc)
 
     pygame.display.flip()
 
 
-def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Slider, button_groups: dict) -> None:
+def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Slider, buttons: dict) -> None:
     global RUNNING, ALGORITHM
 
     for event in pygame.event.get():
@@ -93,22 +93,22 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
             # handle sliders
             map_size.handle(event)
             alg_speed.handle(event)
-            button_groups['alg_group_b'].handle(event)
-            button_groups['gen_b_group'].handle(event)
-            button_groups['reset_grid_b_group'].handle(event)
-            button_groups['start_alg_b_group'].handle(event)
-            button_groups['draw_button_group'].handle(event)
+            buttons['alg_group_b'].handle(event)
+            buttons['gen_b_group'].handle(event)
+            buttons['reset_grid_b_group'].handle(event)
+            buttons['start_alg_b_group'].handle(event)
+            buttons['draw_button_group'].handle(event)
 
         elif state_m.get_state() == GameState.VISUALIZATING:
             pass
 
         elif state_m.get_state() == GameState.CREDIT:
-            button_groups['back_b_group'].handle(event)
+            buttons['back_b_group'].handle(event)
 
         elif state_m.get_state() == GameState.MENU:
-            button_groups['start_b_group'].handle(event)
-            button_groups['credit_b_group'].handle(event)
-            button_groups['end_b_group'].handle(event)
+            buttons['start_b_group'].handle(event)
+            buttons['credit_b_group'].handle(event)
+            buttons['end_b_group'].handle(event)
 
     # game state specific actions that don't need to check events (do not need to be called for each event)
     if state_m.get_state() == GameState.EDITING:
@@ -118,22 +118,23 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
         if key_handler.is_key_pressed(pygame.K_ESCAPE):
             state_m.change_state(GameState.MENU)
 
-        curr_path_symbol = get_current_path_symbol(button_groups['draw_button_group'])
+        curr_path_symbol = get_current_path_symbol(buttons['draw_button_group'])
         map_maze.change_current_symbol(curr_path_symbol)
 
-        if button_groups['gen_b_group'].at_least_one_member_active():
+        if buttons['gen_b_group'].at_least_one_member_active():
             map_maze.generate_maze()
-            button_groups['gen_b_group'].set_all_inactive()
+            buttons['gen_b_group'].set_all_inactive()
 
-        if button_groups['reset_grid_b_group'].at_least_one_member_active():
+        if buttons['reset_grid_b_group'].at_least_one_member_active():
             map_maze.reset_grid()
-            button_groups['reset_grid_b_group'].set_all_inactive()
+            buttons['reset_grid_b_group'].set_all_inactive()
 
-        if map_maze.ready() and (button_groups['start_alg_b_group'].at_least_one_member_active() or key_handler.is_key_pressed(pygame.K_RETURN)):
+        if map_maze.ready() and (buttons['start_alg_b_group'].at_least_one_member_active() or
+                                 key_handler.is_key_pressed(pygame.K_RETURN)):
             state_m.change_state(GameState.VISUALIZATING)
-            button_groups['start_alg_b_group'].set_all_inactive()
+            buttons['start_alg_b_group'].set_all_inactive()
         else:
-            button_groups['start_alg_b_group'].set_all_inactive()
+            buttons['start_alg_b_group'].set_all_inactive()
 
     elif state_m.get_state() == GameState.VISUALIZATING:
         pass
@@ -142,25 +143,25 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
         if key_handler.is_key_pressed(pygame.K_ESCAPE):
             state_m.change_state(GameState.MENU)
 
-        if button_groups['back_b_group'].at_least_one_member_active():
+        if buttons['back_b_group'].at_least_one_member_active():
             state_m.change_state(GameState.MENU)
-            button_groups['back_b_group'].set_all_inactive()
+            buttons['back_b_group'].set_all_inactive()
 
     elif state_m.get_state() == GameState.MENU:
         if key_handler.is_key_pressed(pygame.K_ESCAPE):
             state_m.change_state(GameState.EDITING)
 
-        if button_groups['start_b_group'].at_least_one_member_active():
+        if buttons['start_b_group'].at_least_one_member_active():
             state_m.change_state(GameState.EDITING)
-            button_groups['start_b_group'].set_all_inactive()
+            buttons['start_b_group'].set_all_inactive()
 
-        if button_groups['end_b_group'].at_least_one_member_active():
+        if buttons['end_b_group'].at_least_one_member_active():
             RUNNING = False
-            button_groups['end_b_group'].set_all_inactive()
+            buttons['end_b_group'].set_all_inactive()
 
-        if button_groups['credit_b_group'].at_least_one_member_active():
+        if buttons['credit_b_group'].at_least_one_member_active():
             state_m.change_state(GameState.CREDIT)
-            button_groups['credit_b_group'].set_all_inactive()
+            buttons['credit_b_group'].set_all_inactive()
 
 
 if __name__ == "__main__":
