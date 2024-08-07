@@ -5,6 +5,7 @@ class GameState(Enum):
     MENU = auto()
     EDITING = auto()
     VISUALIZATING = auto()
+    CREDIT = auto()
 
 
 class StateManager:
