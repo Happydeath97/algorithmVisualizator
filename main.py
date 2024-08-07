@@ -138,7 +138,9 @@ def update(state_m: StateManager, map_maze: Map, map_size: Slider, alg_speed: Sl
             buttons['start_alg_b_group'].set_all_inactive()
 
     elif state_m.get_state() == GameState.VISUALIZATING:
-        pass
+        if key_handler.is_key_pressed(pygame.K_ESCAPE):
+            state_m.change_state(GameState.EDITING)
+            ALGORITHM = AlgorithmManager()
 
     elif state_m.get_state() == GameState.CREDIT:
         if key_handler.is_key_pressed(pygame.K_ESCAPE):
@@ -196,15 +198,15 @@ if __name__ == "__main__":
     start_alg_b_group = ButtonGroup(start_alg_b)
     start_alg_b_group.set_all_inactive()
 
-    start_edit_b = Button((SCREEN_W // 2 - 100, 200), (200, 50), "START")
+    start_edit_b = Button((SCREEN_W // 2 - 200, 150), (400, 100), "START", font_size=40)
     start_b_group = ButtonGroup(start_edit_b)
     start_b_group.set_all_inactive()
 
-    credit_b = Button((SCREEN_W // 2 - 100, 300), (200, 50), "ABOUT")
+    credit_b = Button((SCREEN_W // 2 - 200, 300), (400, 100), "ABOUT", font_size=40)
     credit_b_group = ButtonGroup(credit_b)
     credit_b_group.set_all_inactive()
 
-    end_b = Button((SCREEN_W // 2 - 100, 400), (200, 50), "CLOSE")
+    end_b = Button((SCREEN_W // 2 - 200, 450), (400, 100), "CLOSE", font_size=40)
     end_b_group = ButtonGroup(end_b)
     end_b_group.set_all_inactive()
 

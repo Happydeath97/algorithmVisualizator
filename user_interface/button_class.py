@@ -4,15 +4,16 @@ from pygame.font import Font
 
 
 class Button:
-    def __init__(self, start_pos: Tuple[int, int], size: Tuple[int, int], name: str):
+    def __init__(self, start_pos: Tuple[int, int], size: Tuple[int, int], name: str, font_size: int = 24):
         self.pos = start_pos
         self.size = size
         self.active = False
         self.pressed = False
         self.name = name
+        self.font_size = font_size
 
-    def draw_text(self, sc: Surface, text: str, font_size: int = 24, color: Tuple[int, int, int] = (0, 0, 0)) -> None:
-        font = Font(None, font_size)
+    def draw_text(self, sc: Surface, text: str, color: Tuple[int, int, int] = (0, 0, 0)) -> None:
+        font = Font(None, self.font_size)
         text_surface = font.render(text, True, color)
         sc.blit(text_surface, (self.pos[0] + self.size[0]/2 - font.size(text)[0]/2,
                                self.pos[1] + self.size[1]/2 - font.size(text)[1]/2
