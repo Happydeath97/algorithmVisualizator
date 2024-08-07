@@ -1,5 +1,22 @@
 from user_interface.button_class import ButtonGroup
 from map_class import Map
+from pygame import Surface
+from pygame.font import Font
+from typing import Tuple
+
+
+def render_about(sc: Surface, font_size: int, color: Tuple[int, int, int] = (0, 0, 0)) -> None:
+    font = Font(None, font_size)
+    text = """
+    Tohle je test textu jak zobrazit
+    ostatni text a poslat blabla
+    lorem ipsum mit dollor
+    tohle je text ahhahaha
+    """
+    lines = text.split('\n')
+    for i, line in enumerate(lines):
+        text_surface = font.render(line, True, color)
+        sc.blit(text_surface, (0, 0 + i * font.get_linesize()))
 
 
 def get_current_path_symbol(button_group: ButtonGroup) -> str:

@@ -6,7 +6,7 @@ from user_interface.button_class import Button, ButtonGroup
 from game_state import StateManager, GameState
 from key_handler_class import KeyHandler
 from algorithms.algorithm_manager import AlgorithmManager
-from utils import get_current_path_symbol, get_current_algorithm
+from utils import get_current_path_symbol, get_current_algorithm, render_about
 
 # pygame setup
 pygame.init()
@@ -79,6 +79,7 @@ def draw_screen(sc: pygame.Surface, state_m: StateManager, map_maze: Map, map_si
     elif state_m.get_state() == GameState.CREDIT:
         sc.fill((200, 200, 200))
         buttons['back_b_group'].draw(sc)
+        render_about(sc, 50)
 
     pygame.display.flip()
 
