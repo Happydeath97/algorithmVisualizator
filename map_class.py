@@ -111,7 +111,7 @@ class Map:
         self.map = [[to_replace if element == to_find else element for element in row] for row in self.map]
 
     def change_current_symbol(self, new_symbol: str) -> None:
-        if new_symbol == Map.START_SYMBOL or new_symbol == Map.END_SYMBOL or new_symbol == Map.PATH_SYMBOL:
+        if new_symbol in [Map.START_SYMBOL, Map.END_SYMBOL, Map.PATH_SYMBOL]:
             self.current_symbol = new_symbol
 
     def get_map_indexes(self, coord: Tuple[int, int]) -> Tuple[int, int]:
