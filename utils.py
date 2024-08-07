@@ -8,15 +8,22 @@ from typing import Tuple
 def render_about(sc: Surface, font_size: int, color: Tuple[int, int, int] = (0, 0, 0)) -> None:
     font = Font(None, font_size)
     text = """
-    Tohle je test textu jak zobrazit
-    ostatni text a poslat blabla
-    lorem ipsum mit dollor
-    tohle je text ahhahaha
+    This app will let you draw or generate a maze
+    where you can then visualize different path
+    finding algorithms to see how they are trying to find
+    the goal
+    
+    
+    
+
+    
+    It was made by Krystof Vavra
+    for CS50
     """
     lines = text.split('\n')
     for i, line in enumerate(lines):
         text_surface = font.render(line, True, color)
-        sc.blit(text_surface, (0, 0 + i * font.get_linesize()))
+        sc.blit(text_surface, (200, 50 + i * font.get_linesize()))
 
 
 def get_current_path_symbol(button_group: ButtonGroup) -> str:
