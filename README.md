@@ -15,15 +15,17 @@ Maze Pathfinder Visualizer is a Python desktop application developed using the P
 - **key_handler_class.py**: Handles key inputs from the user.
 - **map_class.py**: Manages the creation and representation of the maze.
 - **utils.py**: Contains utility functions used throughout the project.
-- **algorithms/algorithm_manager.py**: Manages the different pathfinding algorithms and their execution.
-- **algorithms/astar_shortest_path.py**: Implements the A* shortest path algorithm.
-- **algorithms/breadth_first_search.py**: Implements the breadth-first search algorithm.
-- **algorithms/depth_first_search.py**: Implements the depth-first search algorithm.
-- **algorithms/dijkstra_algorithm.py**: Implements Dijkstra's algorithm.
-- **algorithms/random_walk.py**: Implements a random walk algorithm.
-- **user_interface/button_class.py**: Manages button UI components.
-- **user_interface/button_group.py**: Manages groups of buttons.
-- **user_interface/slider_class.py**: Manages slider UI components.
+- **algorithms/**
+  - **algorithm_manager.py**: Manages the different pathfinding algorithms and their execution.
+  - **astar_shortest_path.py**: Implements the A* shortest path algorithm.
+  - **breadth_first_search.py**: Implements the breadth-first search algorithm.
+  - **depth_first_search.py**: Implements the depth-first search algorithm.
+  - **dijkstra_algorithm.py**: Implements Dijkstra's algorithm.
+  - **random_walk.py**: Implements a random walk algorithm.
+- **user_interface/**
+  - **button_class.py**: Manages button UI components.
+  - **button_group.py**: Manages groups of buttons.
+  - **slider_class.py**: Manages slider UI components.
 
 ## Design Choices
 - **Modularity**: Each algorithm is implemented in a separate module, allowing easy addition of new algorithms.
