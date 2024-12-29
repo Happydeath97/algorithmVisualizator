@@ -1,5 +1,5 @@
 # Maze Pathfinder Visualizer
-#### Video Demo: [URL HERE]
+#### Video Demo: [VIDEO](https://www.youtube.com/watch?v=GoKL_9Ekfzc)
 #### Description:
 Maze Pathfinder Visualizer is a Python desktop application developed using the Pygame library. It allows users to draw mazes and visualize various pathfinding algorithms as they solve the maze. Users can customize the size of the maze and the speed at which the algorithm operates. This project aims to help users understand the behavior and efficiency of different pathfinding algorithms through visual demonstration.
 
